@@ -9,10 +9,25 @@ class sqlManager:
         port = config.sql.port
         self.db = pymysql.connect(host=host, user=user, password=password, database=database, port=port, charset='utf8mb4')
         self.cursor = self.db.cursor()
-        print("connect successful!!")
     def insert(self, products):
         for i in products:
             sql = "INSERT INTO product_on_shop (name, price, vendorCode) VALUES ('{}', '{}', {})".format(str(i[0]), i[1], i[2]).replace("''", "'")
+            self.cursor.execute(sql)
+        self.db.commit()
+        print("insert successful!!")
+    def get_keywords(self):
+        sql = "SELECT word, id FROM keywords"
+        self.cursor.execute(sql)
+        keywords = self.cursor.fetchall()
+        return keywords
+    def get_index(self):
+        sql = "SELECT vendorCode FROM product_on_shop"
+        self.cursor.execute(sql)
+        index = self.cursor.fetchall()
+        return index
+    def push_today_statistic(self, statistic):
+        for i in statistic:
+            sql = "INSERT INTO statistic_keywordsday_to_day (dayGet, vendorCode, id_keywords, top) VALUES (NOW(), '{}', '{}', '{}');".format(str(i[0]), i[1], i[2])
             self.cursor.execute(sql)
         self.db.commit()
         print("insert successful!!")
